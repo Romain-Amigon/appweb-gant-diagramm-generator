@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu es pauvre ? ... Arrete!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .chart-container {
+            width: 800px;
+            margin: 20px auto;
+            position: relative;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .gantt-chart {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            /* Increased height for more space between bars */
+        }
+
+        .task-bar,
+        .title-bar {
+            position: absolute;
+            height: 30px;
+            /* Increased height of the bars */
+            border-radius: 10px;
+        }
+
+        .task-label,
+        .title-label {
+            position: absolute;
+            font-size: 14px;
+            /* Increased font size for better readability */
+            color: #fff;
+            text-align: center;
+            line-height: 30px;
+            /* Adjusted line-height to match the new bar height */
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .x-axis {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 30px;
+            background-color: #252b60;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        .x-axis div {
+            width: auto;
+            flex: 1;
+            text-align: center;
+        }
+
+
+        #downloadButton {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #3c4395;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        const tasks = JSON.parse('<?= tasks ?>');
+        console.log("Données des tâches :", tasks);
+
+
+    </script>
+</head>
+
+<body>
+    <div class="chart-container">
+        <div id="xAxis" class="x-axis"></div>
+        <div id="gant" class="gantt-chart"></div>
+        <button id="downloadButton">Download picture</button>
+    </div>
+
+    <script>
+        // Sample data with dynamic start and end points
+
+        console.log('test');
+        console.log(tasks);
+        console.log(typeof tasks);
+
+
+
+        // Determine the maximum number of units (e.g., weeks or months)
+        const maxUnits = Math.max(...tasks.map(task => task.end));
+
+        const containerWidth = 800;
+        const containerHeight = 400;
+        const barHeight = 30; // Increased the bar height
+        const gapBetweenBars = 5; // Added a gap between bars to avoid overlap
+        const xAxisHeight = 30;
+        const barsPerUnit = containerWidth / maxUnits; // Calculate units based on maxUnits
+
+        // Function to draw x-axis labels
+        function drawXAxis() {
+            const xAxisContainer = document.getElementById('xAxis');
+            for (let i = 1; i <= maxUnits; i++) {
+                const xAxisLabel = document.createElement('div');
+                xAxisLabel.textContent = i;
+                xAxisContainer.appendChild(xAxisLabel);
+            }
+        }
+
+        // Function to draw Gantt chart
+        function drawGanttChart() {
+            const chartContainer = document.getElementById('gant');
+
+            tasks.forEach((task, index) => {
+                const startX = (task.start - 1) * barsPerUnit; // Adjust start based on dynamic units
+                const width = (task.end - task.start + 1) * barsPerUnit; // Adjust width based on task length
+
+                // Draw Title Bar (Spans the entire width of the diagram)
+                const titleBar = document.createElement('div');
+                titleBar.className = 'title-bar';
+                titleBar.style.backgroundColor = '#3c4395'; // Title bar color
+                titleBar.style.left = `0px`; // Start at the very left of the container
+                titleBar.style.top = `${xAxisHeight + (2 * index) * (barHeight + gapBetweenBars)}px`;
+                titleBar.style.width = `${containerWidth}px`; // Fill the entire width
+                chartContainer.appendChild(titleBar);
+
+                // Draw Title Label
+                const titleLabel = document.createElement('div');
+                titleLabel.className = 'title-label';
+                titleLabel.style.left = `0px`;
+                titleLabel.style.top = `${xAxisHeight + (2 * index) * (barHeight + gapBetweenBars)}px`;
+                titleLabel.style.width = `${containerWidth}px`; // Make sure the label fills the whole width
+                titleLabel.textContent = `Semaine : ${task.task}`;
+                chartContainer.appendChild(titleLabel);
+
+                // Draw Task Bar (Proportional to the task's duration)
+                const taskBar = document.createElement('div');
+                taskBar.className = 'task-bar';
+                taskBar.style.backgroundColor = `#5e6ab0`; // Task bar color
+                taskBar.style.left = `${startX}px`; // Start based on task's start position
+                taskBar.style.top = `${xAxisHeight + (2 * index + 1) * (barHeight + gapBetweenBars)}px`;
+                taskBar.style.width = `${width}px`; // Task bar width proportional to duration
+                chartContainer.appendChild(taskBar);
+
+                // Draw Task Label
+                const taskLabel = document.createElement('div');
+                taskLabel.className = 'task-label';
+                taskLabel.style.left = `${startX}px`;
+                taskLabel.style.top = `${xAxisHeight + (2 * index + 1) * (barHeight + gapBetweenBars)}px`;
+                taskLabel.style.width = `${width}px`; // Same width as the task bar
+                taskLabel.textContent = task.task;
+                chartContainer.appendChild(taskLabel);
+            });
+        }
+
+        // Function to download the Gantt Chart as an image
+        function downloadChartAsImage() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = containerWidth;
+            canvas.height = barHeight + (barHeight * 2 + 10) * tasks.length;
+
+            // Draw the chart onto the canvas
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw X-axis background
+            ctx.fillStyle = '#252b60';
+            ctx.fillRect(0, 0, canvas.width, xAxisHeight);
+
+            // Draw X-axis labels
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            for (let i = 1; i <= maxUnits; i++) {
+                const x = (i - 1) * barsPerUnit + barsPerUnit / 2;
+                ctx.fillText(i, x, xAxisHeight / 2 + 5); // Positioning labels in the middle of the X-axis
+            }
+
+            // Draw tasks
+            tasks.forEach((task, index) => {
+                const startX = (task.start - 1) * barsPerUnit;
+                const width = (task.end - task.start + 1) * barsPerUnit;
+
+                // Title Bar
+                ctx.fillStyle = '#3c4395';
+                ctx.fillRect(0, xAxisHeight + (2 * index) * (barHeight + gapBetweenBars), canvas.width, barHeight);
+
+                // Task Bar
+                ctx.fillStyle = '#5e6ab0';
+                //ctx.fillRect(startX + 5, xAxisHeight + (2 * index + 1) * (barHeight + gapBetweenBars), width - 10, barHeight);
+                ctx.strokeStyle = "blue";
+                ctx.beginPath();
+                ctx.roundRect(startX, xAxisHeight + (2 * index + 1) * (barHeight + gapBetweenBars), width, barHeight, [20]);
+                ctx.fill()
+                ctx.stroke();
+                // Draw task and title labels
+                ctx.fillStyle = 'rgba(255, 255, 255, 255)';
+                ctx.font = '14px Arial';
+                ctx.textAlign = 'center';
+
+                // Title label positioning
+                const titleLabelY = xAxisHeight + (2 * index) * (barHeight + gapBetweenBars) + (barHeight / 2) + 4;
+                ctx.fillText(`Semaine : ${task.task}`, canvas.width / 2, titleLabelY);
+
+                // Task label positioning
+                const taskLabelY = xAxisHeight + (2 * index + 1) * (barHeight + gapBetweenBars) + (barHeight / 2) + 4;
+                ctx.fillText(task.task, startX + width / 2, taskLabelY);
+            });
+
+            // Convert canvas to data URL and trigger download
+            const dataURL = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            google.script.run.saveImageToDrive(dataURL);
+            link.href = dataURL;
+            link.download = 'gantt_chart.png';
+            link.click();
+            canvas.toBlob(function (blob) {
+                const reader = new FileReader();
+                reader.onloadend = function () {
+                    const dataURL = reader.result;
+                    google.script.run.saveImageToDrive(dataURL);
+                };
+                reader.readAsDataURL(blob);
+            }, 'image/png');
+
+        }
+
+        // Render the x-axis and the Gantt chart
+        drawXAxis();
+        drawGanttChart();
+
+        // Attach event handler to the download button
+        document.getElementById('downloadButton').addEventListener('click', downloadChartAsImage);
+    </script>
+</body>
+
+</html>
