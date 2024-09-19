@@ -99,15 +99,13 @@
     </div>
 
     <script>
-        // Sample data with dynamic start and end points
-
         console.log('test');
         console.log(tasks);
         console.log(typeof tasks);
 
 
 
-        // Determine the maximum number of units (e.g., weeks or months)
+        
         const maxUnits = Math.max(...tasks.map(task => task.end));
 
         const containerWidth = 800;
@@ -115,7 +113,7 @@
         const barHeight = 30; // Increased the bar height
         const gapBetweenBars = 5; // Added a gap between bars to avoid overlap
         const xAxisHeight = 30;
-        const barsPerUnit = containerWidth / maxUnits; // Calculate units based on maxUnits
+        const barsPerUnit = containerWidth / maxUnits; 
 
         // Function to draw x-axis labels
         function drawXAxis() {
@@ -228,7 +226,7 @@
                 ctx.fillText(task.task, startX + width / 2, taskLabelY);
             });
 
-            // Convert canvas to data URL and trigger download
+            
             const dataURL = canvas.toDataURL('image/png');
             const link = document.createElement('a');
             google.script.run.saveImageToDrive(dataURL);
@@ -246,11 +244,10 @@
 
         }
 
-        // Render the x-axis and the Gantt chart
+        
         drawXAxis();
         drawGanttChart();
 
-        // Attach event handler to the download button
         document.getElementById('downloadButton').addEventListener('click', downloadChartAsImage);
     </script>
 </body>
