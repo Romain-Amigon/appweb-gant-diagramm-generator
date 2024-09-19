@@ -1,6 +1,6 @@
 # appweb-gant-chart-generator
 
-A google appscript code. It links to an excel sheet, it creates a gantt chart with its content and automatically saves it on a drive associated. You can also download it locally as png.
+A google appscript code. It links to an excel sheet, it creates a gantt chart with its content and automatically saves it on the drive account associated. You can also download it locally as png.
 
 !!! The Excel ID and sheet name are required in the function doGet().
 
