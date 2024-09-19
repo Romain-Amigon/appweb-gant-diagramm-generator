@@ -3,7 +3,7 @@ function doGet() {
   var sheet = SpreadsheetApp.openById('EXCEL ID !!!!').getSheetByName('SHEET NAME !!!!');
   var data = sheet.getDataRange().getValues();
   
-  // Convertir les données en JSON avec la structure souhaitée
+  
   var tasks = data.slice(1).map(function(row) {
     return {
       task: row[0],  // Nom de la tâche
@@ -14,12 +14,12 @@ function doGet() {
   
   
   console.log(tasks)
-  // Charger le fichier HTML et inclure les données en tant que variable JavaScript
+  
   var template = HtmlService.createTemplateFromFile('gantt_inspire');
   
   template.tasks = JSON.stringify(tasks);
   
-  // Générer le contenu HTML avec les données injectées
+
   return template.evaluate();
 }
 
